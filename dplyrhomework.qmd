@@ -1,0 +1,104 @@
+---
+title: "Dplyr homework"
+author: "Leopold Gross"
+format: html
+editor: visual
+echo: false 
+message: false
+---
+
+```{r}
+#| echo: false
+#| message: false
+here::i_am("dplyr.Rproj")
+
+library(here)
+library(dplyr)
+```
+
+```{r}
+spotify <- readRDS('top-spotify-hits.Rds')
+
+```
+
+## EX1
+
+Question 1
+
+the data set contains `r count(spotify%>%distinct(song))` songs, `r count(spotify%>%distinct(artist))` artists and `r count(spotify%>%distinct(genre))` genres.
+
+Question 2
+
+```{r}
+spotify %>% group_by(year) %>% dplyr::summarise(song = n()) %>% knitr::kable()
+  
+```
+
+Question 3
+
+The most popular artist is `r spotify %>% distinct(song, artist) %>% count(artist) %>% slice_max(n)` songs of her are in the spotify top songs !
+
+Question 4
+
+```{r}
+spotify %>% group_by(genre) %>% summarise(avg_bpm=mean(tempo), med_bpm=median(tempo), max(tempo), min(tempo)) %>% knitr::kable()
+```
+
+Question 5
+
+```{r}
+spotify %>% group_by(year) %>% summarise(med_nrgy=median(energy), med_danceability=median(danceability)) %>% knitr::kable()
+```
+
+Question 6
+
+```{r}
+library(ggplot2)
+
+median_values <-spotify %>% group_by(year) %>% summarise(med_nrgy=median(energy), med_danceability=median(danceability)) 
+
+ggplot(median_values, aes(x = year)) +
+  geom_line(aes(y = med_nrgy, color = "Median Energy")) +
+  geom_line(aes(y = med_danceability, color = "Median Danceability")) 
+```
+
+## EXERCISE 2
+
+Question 1
+
+```{r}
+
+#| echo: false
+#| message: false
+dropout <- readRDS('dropout.RDS')
+
+dropout %>%  group_by(Gender, `Marital status`) %>% summarise(median_age=median(`Age at enrollment`)) %>%  knitr::kable()
+
+
+
+```
+
+question 2
+
+```{r}
+library(tidyr)
+#| echo: false
+#| message: false
+
+dropout %>% 
+  group_by(Gender, `Marital status`) %>% summarise(median_age=median(`Age at enrollment`)) %>% pivot_wider(names_from = Gender, values_from = `Marital status`) %>% knitr::kable()
+```
+
+question 3
+
+```{r}
+dataframe <- dropout %>% group_by(Target) %>% summarise_at(vars(starts_with("Curricular units")), mean) %>% knitr::kable()
+dataframe
+```
+
+Question 4
+
+```{r}
+dropout %>% group_by(Target) %>% summarise_at(vars(starts_with("Curricular units")), mean) %>% pivot_longer(starts_with("Curricular units"), names_to = "Units") %>% pivot_wider(names_from = Target) %>% knitr::kable()
+```
+
