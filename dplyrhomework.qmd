@@ -7,8 +7,6 @@ echo: false
 message: false
 ---
 
-essai 1
-
 ```{r}
 #| echo: false
 #| message: false
